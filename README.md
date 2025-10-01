@@ -28,8 +28,8 @@ sbatch job.slurm
 
 ## References
 
-1. [OpenAI Harmony](https://github.com/openai/harmony) – Harmony conversation format.
-2. [Multilingual-Thinking Dataset](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking) – Dataset Info.
-3. [PEFT: LoRA Fine-Tuning](https://huggingface.co/docs/peft/index) – LoRA Info
+1. [OpenAI Harmony](https://github.com/openai/harmony)
+2. [Multilingual-Thinking Dataset](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking)
+3. [PEFT: LoRA Fine-Tuning](https://huggingface.co/docs/peft/index)
 
 ---
