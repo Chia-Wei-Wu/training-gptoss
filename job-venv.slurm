@@ -7,18 +7,18 @@
 #SBATCH --gres=gpu:                      # Number of GPU
 #SBATCH --cpus-per-task=                 # Number of CPU
 #SBATCH --mem=                           # The size of memory 
-#SBATCH --time=2:00:00                   # Limit time 120 mins
+#SBATCH --time=                          # Max run time 
 #SBATCH --output=logs/slurm_%j.log
 #SBATCH --error=logs/slurm_%j.err
 
 
 # ====== Environment Setup ======
 
-LOGDIR="$HOME/training-gptoss/logs"
-RESULTDIR="$HOME/training-gptoss/results"
 WORKDIR=$(pwd)
 ENVNAME="env_training"
 ENVDIR="$WORKDIR/$ENVNAME"
+LOGDIR="$HOME/training-gptoss/logs"
+RESULTDIR="$HOME/training-gptoss/results"
 
 mkdir -p "$LOGDIR" "$RESULTDIR"
 
