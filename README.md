@@ -3,19 +3,7 @@
 Fine-tune the **GPTOSS** model using **LoRA** with the HuggingFaceH4/Multilingual-Thinking dataset.
 
 ## Environment Setup
-You can set up the training environment either with venv or conda.
-
-Option 1: Python venv
-
-```bash
-cd training-gptoss
-python -m venv env_training
-source ./env_training/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Option 2: Conda
+You can set up the training environment with conda.
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -36,11 +24,6 @@ We use the **[Multilingual-Thinking](https://huggingface.co/datasets/HuggingFace
 Fine-tune GPTOSS using **LoRA** with GPU memory optimizations for efficient training.
 Submit your training job with Slurm:
 
-If using venv
-```bash
-sbatch job-venv.slurm
-```
-If using conda
 ```bash
 sbatch job-conda.slurm
 ```

@@ -2,14 +2,9 @@
 # coding: utf-8
 
 
-# ------------------------------------------------------
-# Load dataset and transfer to harmony format
-# ------------------------------------------------------
-
 def download_dataset():
     from datasets import load_dataset
     return load_dataset("HuggingFaceH4/Multilingual-Thinking", split="train")
-
 
 def transfer_harmony(datasets):
     from openai_harmony import Role, Message, SystemContent, Conversation
@@ -35,12 +30,6 @@ def transfer_harmony(datasets):
             conversations.append(convo)
 
     return conversations
-
-
-
-# ------------------------------------------------------
-# Build Training Dataset with sequence packing
-# ------------------------------------------------------
 
 def build_dataset(conversations, model_name, max_length=2048):
     from datasets import Dataset
@@ -75,15 +64,9 @@ def build_dataset(conversations, model_name, max_length=2048):
     train_dataset = Dataset.from_list(features)
     return train_dataset
 
-
-
-# ------------------------------------------------------
-# Happy Training model with OOM optimization
-# ------------------------------------------------------
-
 def train_model(train_dataset, model_name):
     import os, gc, torch
-    from peft import LoraConfig, get_peft_model
+    from peft import LoraConfig, get_peft_model, PeftModel
     from transformers import Trainer, TrainingArguments, AutoModelForCausalLM, AutoTokenizer
     try:
         
@@ -137,19 +120,24 @@ def train_model(train_dataset, model_name):
 
         trainer.train()
 
-        # Save fine-tuned model
-        save_path = os.path.join("results/ft_model")
+        # Save LoRA adapter
+        save_path = os.path.join("results/lora_adapter")
         os.makedirs(save_path, exist_ok=True)
         model.save_pretrained(save_path)
         tokenizer.save_pretrained(save_path)
+
+        # Save Full fine-tune Model
+        base_model = AutoModelForCausalLM.from_pretrained(model_name, dtype=torch.float16, device_map="auto")
+        merged_model = PeftModel.from_pretrained(base_model, save_path)
+        merged_model = merged_model.merge_and_unload()
+        os.makedirs("results/ft_model_full", exist_ok=True)
+        merged_model.save_pretrained("results/ft_model_full")
+        tokenizer.save_pretrained("results/ft_model_full")
 
     except Exception as e:
         print(f"Training failed: {e}")
         raise
 
-# ------------------------------------------------------
-# Main function
-# -----------------------------
 def main():
     model_name = "openai/gpt-oss-20b"
     datasets = download_dataset()
