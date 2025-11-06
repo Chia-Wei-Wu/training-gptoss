@@ -14,7 +14,7 @@ conda create -n env_training python=3.11.5 -y
 conda activate env_training
 
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements_transformer.txt
 ```
 
 ## Training
