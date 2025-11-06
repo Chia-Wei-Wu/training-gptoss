@@ -1,27 +1,25 @@
 #!/bin/bash
-#SBATCH --job-name=                      # Job Name
-#SBATCH --account=                       # Account
-#SBATCH --partition=                     # Partition
-#SBATCH --nodes=                         # Number of nodes
-#SBATCH --ntasks-per-node=               # Number of node for per task
-#SBATCH --gres=gpu:                      # Number of GPU
-#SBATCH --cpus-per-task=                 # Number of CPU
-#SBATCH --mem=                           # The size of memory 
-#SBATCH --time=                          # Max run time 
+#SBATCH --job-name=                              # Job Name
+#SBATCH --account=                               # Account
+#SBATCH --partition=                             # Partition
+#SBATCH --nodes=                                 # Number of nodes
+#SBATCH --ntasks-per-node=                       # Number of tasks per node
+#SBATCH --gres=gpu:                              # Number of GPUs
+#SBATCH --cpus-per-task=                         # Number of CPU cores per task
+#SBATCH --mem=                                   # Memory per node
+#SBATCH --time=                                  # Max run time (hh:mm:ss)
 #SBATCH --output=logs/slurm_%j.log
 #SBATCH --error=logs/slurm_%j.err
 
- 
 # ====== Environment Setup ======
-
-WORKDIR=$(pwd)
+WORKDIR="$HOME/training-gptoss"
 ENVNAME="env_training"
 LOGDIR="$WORKDIR/logs"
 RESULTDIR="$WORKDIR/results"
 
 mkdir -p "$LOGDIR" "$RESULTDIR"
 
-# -------- Conda Initialization --------
+# ====== Conda Initialization ======
 source $HOME/miniconda3/etc/profile.d/conda.sh
 conda activate "$ENVNAME"
 echo "Activated conda environment: $ENVNAME"
@@ -40,6 +38,6 @@ echo "MASTER_ADDR=$MASTER_ADDR, MASTER_PORT=$MASTER_PORT"
 
 echo "Starting training..."
 
-srun python "$WORKDIR/train.py"
+srun python "$WORKDIR/train_unsloth.py"
 
 echo "=== Job finished ==="
