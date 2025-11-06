@@ -39,7 +39,7 @@ def formatting_prompts_func(data, tokenizer):
     return {"text": conversations}
 
 def train(model, tokenizer, train_dataset, result_path):
-    
+
     import os
     from trl import SFTConfig, SFTTrainer
 
@@ -70,9 +70,9 @@ def train(model, tokenizer, train_dataset, result_path):
     trainer.train()
 
     # Save LoRA adapter
-    save_path = os.path.join(f"{result_path}/lora_adapter")
+    save_path = os.path.join(f"{result_path}/unsloth_lora_adapter")
     os.makedirs(save_path, exist_ok=True)
-    peft_model.save_pretrained(save_path)
+    model.save_pretrained(save_path)
     tokenizer.save_pretrained(save_path)
 
 
