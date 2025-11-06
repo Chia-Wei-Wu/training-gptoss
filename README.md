@@ -37,6 +37,8 @@ Firstly, merge the fine-tuned weights with the base model, and use this model fo
 ```bash
 python chat_template.py
 ```
+## Note
+1. train_unsloth.py runs faster than train_tf.py.
 
 ## References
 
