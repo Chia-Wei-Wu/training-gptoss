@@ -48,7 +48,7 @@ python ./fix_target/fix_target.py
 Use the **[Multilingual-Thinking](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking)** dataset, converted to **Harmony conversation format**.
 
 Fine-tune GPTOSS using **LoRA** for efficient training.
-Submit your training job with Slurm:
+Submit your training job with Slurm.
 
 ```bash
 sbatch job_tf.slurm            # using train_tf.py
