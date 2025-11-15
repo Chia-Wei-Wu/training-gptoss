@@ -1,9 +1,9 @@
 # Training GPTOSS
 
-Fine-tune the **GPTOSS** model using **LoRA** with the HuggingFaceH4/Multilingual-Thinking dataset.
+Fine-tune the **GPTOSS** (from Openai or Unsloth) model using **LoRA** with the HuggingFaceH4/Multilingual-Thinking dataset.
 
 ## Environment Setup
-You can set up the training environment with conda.
+Set up the training environment with conda.
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
@@ -14,32 +14,38 @@ conda create -n env_training python=3.11.5 -y
 conda activate env_training
 
 pip install --upgrade pip
-pip install -r requirements_tf.txt           # using train_tf.py
-pip install -r requirements_unsloth.txt      # using train_unsloth.py
+
+cd requirements
+pip install -r tf.txt           # using train_tf.py
+pip install -r unsloth.txt      # using train_unsloth.py
 ```
 
 ## Fix Target
 
 **Fix Target** is a utility to properly mask labels in your dataset. This ensures that target tokens are correctly handled during training.
 
-### Features
-
 - Automatically adds the `<|target|>` token after relevant message headers:
   - `<|start|>assistant<|channel|>final<|message|>`
   - `<|start|>assistant<|message|>`
 - Ensures proper masking of labels in your data.
 
-### Usage
-
-You can test the functionality using the provided script:
+Test the functionality using the provided script:
 
 ```bash
 python ./fix_target/fix_target.py
 ```
 
+## Distributed Data Parallelism
+
+**Distributed Data Parallelism(DDP)** is the method that can speed up the training process by distributing data across multiple GPUs.
+
+```bash
+#SBATCH --gres=gpu:<# of gpus>            # located in job_unsloth.slurm or job_tf.slurm
+```
+
 ## Training
 
-We use the **[Multilingual-Thinking](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking)** dataset, converted to **Harmony conversation format**.
+Use the **[Multilingual-Thinking](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking)** dataset, converted to **Harmony conversation format**.
 
 Fine-tune GPTOSS using **LoRA** for efficient training.
 Submit your training job with Slurm:
@@ -51,13 +57,11 @@ sbatch job_unsloth.slurm       # using train_unsloth.py
 
 ## Inference
 
-Firstly, merge the fine-tuned weights with the base model, and use this model for inference.
+Merge the fine-tuned weights with the base model, and use this model for inference.
 
 ```bash
 python chat_template.py
 ```
-## Note
-1. train_unsloth.py runs faster than train_tf.py.
 
 ## References
 
