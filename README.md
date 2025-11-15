@@ -22,14 +22,14 @@ pip install -r requirements_unsloth.txt      # using train_unsloth.py
 
 **Fix Target** is a utility to properly mask labels in your dataset. This ensures that target tokens are correctly handled during training.
 
-## Features
+### Features
 
 - Automatically adds the `<|target|>` token after relevant message headers:
   - `<|start|>assistant<|channel|>final<|message|>`
   - `<|start|>assistant<|message|>`
 - Ensures proper masking of labels in your data.
 
-## Usage
+### Usage
 
 You can test the functionality using the provided script:
 
