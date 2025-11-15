@@ -18,6 +18,25 @@ pip install -r requirements_tf.txt           # using train_tf.py
 pip install -r requirements_unsloth.txt      # using train_unsloth.py
 ```
 
+## Fix Target
+
+**Fix Target** is a utility to properly mask labels in your dataset. This ensures that target tokens are correctly handled during training.
+
+## Features
+
+- Automatically adds the `<|target|>` token after relevant message headers:
+  - `<|start|>assistant<|channel|>final<|message|>`
+  - `<|start|>assistant<|message|>`
+- Ensures proper masking of labels in your data.
+
+## Usage
+
+You can test the functionality using the provided script:
+
+```bash
+python ./fix_target/fix_target.py
+```
+
 ## Training
 
 We use the **[Multilingual-Thinking](https://huggingface.co/datasets/HuggingFaceH4/Multilingual-Thinking)** dataset, converted to **Harmony conversation format**.
