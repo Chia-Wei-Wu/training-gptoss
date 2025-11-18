@@ -91,8 +91,13 @@ def setup_dataset():
 
 
 def fix_target(text):
+
+    text = re.sub(
+        r"<\|start\|>assistant<\|message\|>",
+        "<|start|>assistant<|channel|>final<|message|>",
+        text)
     
-    pattern = r"(<\|start\|>assistant(?:<\|channel\|>final)?<\|message\|>)"
+    pattern = r"(<\|start\|>assistant<\|channel\|>final<\|message\|>)"
     matches = list(re.finditer(pattern, text))
 
     if not matches:
@@ -144,6 +149,7 @@ def test_model(model, tokenizer, train_dataset, result_path):
         report_to = "none",
         gradient_checkpointing=True,
         gradient_checkpointing_kwargs={'use_reentrant':False},
+        dataset_num_proc=4,
     )
     
     trainer = SFTTrainer(
@@ -158,7 +164,7 @@ def test_model(model, tokenizer, train_dataset, result_path):
         instruction_part = "<|start|>user<|message|>", 
         response_part="<|message|><|target|>")
 
-    trainer = train_on_responses_only(trainer, **gpt_oss_kwargs)
+    trainer = train_on_responses_only(trainer, **gpt_oss_kwargs, num_proc=4)
 
     # print result
     for i in range(0, 7):

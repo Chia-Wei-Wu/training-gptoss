@@ -24,12 +24,10 @@ pip install -r unsloth.txt      # using train_unsloth.py
 
 ## Fix Target
 
-Fix Target is a key function that ensures label tokens are correctly masked and handled for all supported datasets during training.
+Fix Target is a key function that ensures label tokens are correctly masked and processed across all supported datasets during training.
 
-- Automatically adds the `<|target|>` token after final assistant message headers:
-  - `<|start|>assistant<|channel|>final<|message|>`
-  - `<|start|>assistant<|message|>`
-- Ensures proper masking of labels in different dataset.
+- Converts `<|start|>assistant<|message|>` into `<|start|>assistant<|channel|>final<|message|>`.
+- Automatically appends the `<|target|>` token after the final assistant message header, `<|start|>assistant<|channel|>final<|message|>`.
 
 Test the functionality using the provided script:
 

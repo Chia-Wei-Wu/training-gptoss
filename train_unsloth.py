@@ -41,8 +41,13 @@ def pre_model(model_name, max_token):
 
 
 def fix_target(text):
+
+    text = re.sub(
+        r"<\|start\|>assistant<\|message\|>",
+        "<|start|>assistant<|channel|>final<|message|>",
+        text)
     
-    pattern = r"(<\|start\|>assistant(?:<\|channel\|>final)?<\|message\|>)"
+    pattern = r"(<\|start\|>assistant<\|channel\|>final<\|message\|>)"
     matches = list(re.finditer(pattern, text))
 
     if not matches:
@@ -79,8 +84,8 @@ def train(model, tokenizer, train_dataset, result_path):
         output_dir = result_path,
         per_device_train_batch_size = 1,
         gradient_accumulation_steps = 4,
-        num_train_epochs = 5,
-        # max_steps = 10,
+        # num_train_epochs = 5,
+        max_steps = 10,
         learning_rate = 2e-4,
         logging_steps = 1,
         optim = "adamw_8bit",
@@ -117,7 +122,7 @@ def train(model, tokenizer, train_dataset, result_path):
     ### Save LoRA adapter
     save_path = os.path.join(f"{result_path}/lora_adapter")
     os.makedirs(save_path, exist_ok=True)
-    model.save_pretrained(save_path)
+    model.save_pretrained(save_path, save_embedding_layers=True)
     tokenizer.save_pretrained(save_path)
 
 

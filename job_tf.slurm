@@ -31,6 +31,7 @@ python -c "import torch; print('Torch version:', torch.__version__, 'CUDA availa
 export NCCL_DEBUG=INFO
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export TOKENIZERS_PARALLELISM=false
+export NCCL_IB_HCA=mlx5_7
 
 MASTER_ADDR=$(scontrol show hostnames $SLURM_NODELIST | head -n 1)
 MASTER_PORT=$((12000 + RANDOM % 10000))

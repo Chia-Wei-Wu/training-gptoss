@@ -29,18 +29,20 @@ def pre_model(model_name, max_token):
     peft_config = LoraConfig(
         r=8,
         lora_alpha=16,
-        target_modules="all-linear",
-        # target_parameters=[
-        #     "7.mlp.experts.gate_up_proj",
-        #     "7.mlp.experts.down_proj",
-        #     "15.mlp.experts.gate_up_proj",
-        #     "15.mlp.experts.down_proj",
-        #     "23.mlp.experts.gate_up_proj",
-        #     "23.mlp.experts.down_proj",],
-    )
+        target_modules="all-linear",)
 
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
+
+    tokenizer.add_special_tokens({
+        "bos_token": "<BOS>",
+        "eos_token": "<EOS>",
+        "pad_token": "<PAD>",})
+
+    model.resize_token_embeddings(len(tokenizer))
+    model.config.bos_token_id = tokenizer.bos_token_id
+    model.config.eos_token_id = tokenizer.eos_token_id
+    model.config.pad_token_id = tokenizer.pad_token_id
 
     return model, tokenizer
 
@@ -83,7 +85,6 @@ def formatting_prompts_func(batch, tokenizer):
         labels_text = find_labels(formatted_text, tokenizer)
 
         input_ids = tokenizer(formatted_text, truncation=True)["input_ids"]
-        # labels = tokenizer(labels_text, truncation=True)["input_ids"]
 
         input_ids_list.append(input_ids)
         labels_list.append(labels_text)
@@ -91,14 +92,14 @@ def formatting_prompts_func(batch, tokenizer):
     return {"input_ids": input_ids_list, "labels": labels_list}
 
 
-def train(model, tokenizer, train_dataset, result_path):
+def train(model, tokenizer, train_dataset, result_path, max_token):
     
     training_args = SFTConfig(
         output_dir = result_path,
         per_device_train_batch_size = 1,
         gradient_accumulation_steps = 4,
-        num_train_epochs = 5,
-        # max_steps = 10,
+        # num_train_epochs = 5,
+        max_steps = 3,
         learning_rate = 2e-4,
         logging_steps = 1,
         weight_decay = 0.001,
@@ -108,6 +109,8 @@ def train(model, tokenizer, train_dataset, result_path):
         gradient_checkpointing = True,
         gradient_checkpointing_kwargs={'use_reentrant':False},
         dataset_num_proc=4,
+        max_length = max_token,
+        ddp_find_unused_parameters=False,
     )
 
     trainer = SFTTrainer(
@@ -129,7 +132,7 @@ def train(model, tokenizer, train_dataset, result_path):
     ### Save LoRA adapter
     save_path = os.path.join(f"{result_path}/lora_adapter")
     os.makedirs(save_path, exist_ok=True)
-    model.save_pretrained(save_path)
+    model.save_pretrained(save_path, save_embedding_layers=True)
     tokenizer.save_pretrained(save_path)
 
 
@@ -149,7 +152,7 @@ def main():
 
     print("Happy Training GPTOSS...", flush=True)
 
-    train(model, tokenizer, train_dataset, result_path)
+    train(model, tokenizer, train_dataset, result_path, max_token)
 
 if __name__ == "__main__":
     main()

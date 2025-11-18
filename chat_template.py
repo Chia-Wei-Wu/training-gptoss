@@ -24,7 +24,7 @@ def download_ft_model(model_name, lora_url):
     from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
 
     quantization_config = Mxfp4Config(dequantize=True)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(lora_url)
 
     model_kwargs = dict(
         attn_implementation="eager",
