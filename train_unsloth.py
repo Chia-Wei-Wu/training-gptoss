@@ -1,7 +1,8 @@
 import torch, os, json, re
-from datasets import Dataset, load_dataset
+import torch.distributed as dist
 from unsloth import FastLanguageModel
 from trl import SFTConfig, SFTTrainer
+from datasets import Dataset, load_dataset
 from unsloth.chat_templates import train_on_responses_only, standardize_sharegpt
 
 os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
@@ -34,6 +35,7 @@ def pre_model(model_name, max_token):
     )
 
     tokenizer.add_special_tokens({"additional_special_tokens": ["<|target|>"]})
+    model.resize_token_embeddings(len(tokenizer))
 
     return model, tokenizer
 
@@ -123,7 +125,7 @@ def main():
     
     model_name = "unsloth/gpt-oss-20b"
     dataset_path = "HuggingFaceH4/Multilingual-Thinking"
-    result_path = "results-ver3"
+    result_path = "results"
     max_token = 4096
 
     model, tokenizer = pre_model(model_name, max_token)
@@ -136,6 +138,9 @@ def main():
     print("Happy Training GPTOSS...", flush=True)
 
     train(model, tokenizer, train_dataset, result_path)
+
+    if dist.is_initialized():
+        dist.destroy_process_group()
 
 
 if __name__ == "__main__":

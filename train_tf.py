@@ -137,7 +137,7 @@ def main():
 
     model_name = "openai/gpt-oss-20b"
     dataset_path = "HuggingFaceH4/Multilingual-Thinking"
-    result_path = "results-ver6"
+    result_path = "results-ver4"
     max_token = 4096
 
     model, tokenizer = pre_model(model_name, max_token)
