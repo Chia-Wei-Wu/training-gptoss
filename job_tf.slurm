@@ -40,4 +40,10 @@ echo "Starting training..."
 
 srun python "$WORKDIR/train_tf.py"
 
+# srun torchrun \
+#      --standalone \
+#      --nnodes=1 \
+#      --nproc_per_node=4 \
+#      "$WORKDIR/train_tf.py"
+
 echo "=== Job finished ==="

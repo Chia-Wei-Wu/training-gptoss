@@ -75,9 +75,9 @@ def chatting(model, tokenizer):
 
 def main():
 
-    model_name = "openai/gpt-oss-20b"
-    # model_name = "unsloth/gpt-oss-20b"                             # unsloth model
-    lora_url = "results/lora_adapter"
+    # model_name = "openai/gpt-oss-20b"
+    model_name = "unsloth/gpt-oss-20b"                             # unsloth model
+    lora_url = "results-ver1/lora_adapter"
 
     # model, tokenizer = download_base_model(model_name)             # base model
     model, tokenizer = download_ft_model(model_name, lora_url)       # ft model  

@@ -10,7 +10,6 @@ def pre_model(model_name, max_token):
 
     local_rank = int(os.getenv("LOCAL_RANK", 0))
     device = f"cuda:{local_rank}"  
-
     
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name = model_name,
@@ -39,10 +38,6 @@ def pre_model(model_name, max_token):
     return model, tokenizer
 
 
-def download_dataset():
-    return load_dataset("HuggingFaceH4/Multilingual-Thinking", split="train")
-
-
 def fix_target(text):
     
     pattern = r"(<\|start\|>assistant(?:<\|channel\|>final)?<\|message\|>)"
@@ -60,9 +55,9 @@ def fix_target(text):
     return new_text
 
 
-def formatting_prompts_func(batch, tokenizer):
+def formatting_prompts_func(example, tokenizer):
 
-    convos = batch["messages"]
+    convos = example["messages"]
     
     texts = []
     
@@ -82,13 +77,10 @@ def train(model, tokenizer, train_dataset, result_path):
         output_dir = result_path,
         per_device_train_batch_size = 1,
         gradient_accumulation_steps = 4,
-        num_train_epochs = 1,
+        num_train_epochs = 5,
+        # max_steps = 10,
         learning_rate = 2e-4,
         logging_steps = 1,
-        fp16 = False, 
-        bf16 = False,
-        save_strategy = "steps",
-        warmup_steps = 5,
         optim = "adamw_8bit",
         weight_decay = 0.001,
         lr_scheduler_type = "linear",
@@ -96,6 +88,7 @@ def train(model, tokenizer, train_dataset, result_path):
         report_to = "none",
         gradient_checkpointing = True,
         gradient_checkpointing_kwargs={'use_reentrant':False},
+        dataset_num_proc=4,
     )
     
     trainer = SFTTrainer(
@@ -110,8 +103,12 @@ def train(model, tokenizer, train_dataset, result_path):
         instruction_part = "<|start|>user<|message|>", 
         response_part="<|message|><|target|>")
 
-    trainer = train_on_responses_only(trainer, **gpt_oss_kwargs)
+    trainer = train_on_responses_only(trainer, **gpt_oss_kwargs, num_proc=2)
 
+    # text_input_ids = tokenizer.decode(trainer.train_dataset[100]["input_ids"])
+    # print(f"text_input_ids:\n{text_input_ids}")
+    # text_label = tokenizer.decode([tokenizer.pad_token_id if x == -100 else x for x in trainer.train_dataset[100]["labels"]]).replace(tokenizer.pad_token, "")
+    # print(f"text_label:\n{text_label}")
 
     trainer.train()
 
@@ -126,14 +123,12 @@ def main():
     
     model_name = "unsloth/gpt-oss-20b"
     dataset_path = "HuggingFaceH4/Multilingual-Thinking"
-    result_path = "results"
+    result_path = "results-ver3"
     max_token = 4096
 
     model, tokenizer = pre_model(model_name, max_token)
     
     train_dataset = load_dataset(dataset_path, split="train")
-    
-    train_dataset = train_dataset
 
     train_dataset = standardize_sharegpt(train_dataset)
     train_dataset = train_dataset.map(formatting_prompts_func, fn_kwargs={"tokenizer": tokenizer}, batched=True)
