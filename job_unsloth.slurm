@@ -12,6 +12,7 @@
 #SBATCH --error=logs/slurm_%j.err
 
 # ====== Environment Setup ======
+
 WORKDIR="$HOME/training-gptoss"
 ENVNAME="env_training"
 LOGDIR="$WORKDIR/logs"
@@ -20,6 +21,7 @@ RESULTDIR="$WORKDIR/results"
 mkdir -p "$LOGDIR" "$RESULTDIR"
 
 # ====== Conda Initialization ======
+
 source $HOME/miniconda3/etc/profile.d/conda.sh
 conda activate "$ENVNAME"
 echo "Activated conda environment: $ENVNAME"
@@ -28,6 +30,7 @@ which python
 python -c "import torch; print('Torch version:', torch.__version__, 'CUDA available:', torch.cuda.is_available())"
 
 # ====== Happy Training ======
+
 export NCCL_DEBUG=INFO
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export TOKENIZERS_PARALLELISM=false

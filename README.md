@@ -44,7 +44,7 @@ The results of using different models and varying numbers of GPUs.
 | Model               |   1 GPU   |   2 GPUs  |   4 GPUs  | 
 |:--------------------|----------:|----------:|----------:|
 | unsloth/gpt-oss-20b |  7775.18  |  4792.44  |  2530.38  | 
-| openai/gpt-oss-20b  |  Running  |  Running  |  Running  |
+| openai/gpt-oss-20b  |  6081.04  |  3131.17  |  1732.04  |
 
 ```bash
 #SBATCH --gres=gpu:<# of gpus>       # Specify how many GPUs to use, e.g., 1, 2, 4, etc.

@@ -1,8 +1,9 @@
+import torch
+from peft import PeftModel
+from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
+
 def download_base_model(model_name):
     
-    import torch
-    from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
-
     quantization_config = Mxfp4Config(dequantize=True)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -19,10 +20,6 @@ def download_base_model(model_name):
 
 def download_ft_model(model_name, lora_url):
     
-    import torch
-    from peft import PeftModel
-    from transformers import AutoTokenizer, AutoModelForCausalLM, Mxfp4Config
-
     quantization_config = Mxfp4Config(dequantize=True)
     tokenizer = AutoTokenizer.from_pretrained(lora_url)
 
@@ -34,7 +31,8 @@ def download_ft_model(model_name, lora_url):
     )
 
     base_model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
-
+    base_model.resize_token_embeddings(len(tokenizer))
+    
     model = PeftModel.from_pretrained(base_model, lora_url)
     model = model.merge_and_unload()
 
@@ -57,15 +55,22 @@ def chatting(model, tokenizer):
         return_tensors="pt"
     ).to(model.device)
 
+    attention_mask = input_ids.ne(tokenizer.eos_token_id).int().to(model.device)
+
     gen_kwargs = {
         "max_new_tokens": 512, 
         "do_sample": True, 
         "temperature": 0.6, 
-        "top_p": None, 
-        "top_k": None
+        "top_p": 1, 
+        "top_k": 50
     }
 
-    output_ids = model.generate(input_ids, **gen_kwargs)
+    output_ids = model.generate(
+        input_ids,
+        attention_mask=attention_mask,
+        pad_token_id=tokenizer.eos_token_id,
+        **gen_kwargs,)
+    
     response = tokenizer.batch_decode(output_ids)[0]
     response = response.split("<|channel|>final<|message|>")[-1].strip()
     response = response.replace("<|return|>", "").strip()
@@ -77,7 +82,7 @@ def main():
 
     # model_name = "openai/gpt-oss-20b"
     model_name = "unsloth/gpt-oss-20b"                             # unsloth model
-    lora_url = "results-ver1/lora_adapter"
+    lora_url = "results/lora_adapter"
 
     # model, tokenizer = download_base_model(model_name)             # base model
     model, tokenizer = download_ft_model(model_name, lora_url)       # ft model  

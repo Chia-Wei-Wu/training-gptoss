@@ -108,7 +108,7 @@ def train(model, tokenizer, train_dataset, result_path):
 
     gpt_oss_kwargs = dict(
         instruction_part = "<|start|>user<|message|>", 
-        response_part="<|message|><|target|>")
+        response_part="<|start|>assistant<|channel|>final<|message|><|target|>")
 
     trainer = train_on_responses_only(trainer, **gpt_oss_kwargs, num_proc=2)
 
