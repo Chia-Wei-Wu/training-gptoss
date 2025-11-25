@@ -1,4 +1,4 @@
-import torch, os, json, re
+import torch, os, json, re, wandb
 import torch.distributed as dist
 from unsloth import FastLanguageModel
 from trl import SFTConfig, SFTTrainer
@@ -92,7 +92,7 @@ def train(model, tokenizer, train_dataset, result_path):
         weight_decay = 0.001,
         lr_scheduler_type = "linear",
         seed = 3407,
-        report_to = "none",
+        report_to=["wandb"],
         gradient_checkpointing = True,
         gradient_checkpointing_kwargs={'use_reentrant':False},
         dataset_num_proc=4,
@@ -132,6 +132,11 @@ def main():
     dataset_path = "HuggingFaceH4/Multilingual-Thinking"
     result_path = "results"
     max_token = 4096
+
+    rank = int(os.getenv("RANK", 0))
+    if rank == 0:
+        import wandb
+        wandb.init(project="project", name=result_path)
 
     model, tokenizer = pre_model(model_name, max_token)
     
